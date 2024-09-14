@@ -2,14 +2,12 @@ import * as dotenv from "dotenv";
 
 dotenv.config();
 
+import indexRouter from "./src/routes/index";
 var createError = require("http-errors");
 var express = require("express");
 var path = require("path");
 var cookieParser = require("cookie-parser");
 var logger = require("morgan");
-
-var indexRouter = require("./routes/index");
-var usersRouter = require("./routes/users");
 
 var app = express();
 
@@ -23,12 +21,36 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
-app.use("/", indexRouter);
-app.use("/users", usersRouter);
+//Enable CORS from client side
+app.use(function (req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Methods", "PUT,GET,DELETE,POST,OPTIONS");
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With,Content-Type, Accept, Authorization, Apptoken," +
+      " Access-Control-Allow-Credential"
+  );
+  res.header("Access-Control-Allow-Credentials", "true");
+  res.language = req.query.language || "en";
+  res.langKey = req.query.langKey || false;
+  global._language = res.language;
+
+  next();
+});
+
+indexRouter(app);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
   next(createError(404));
+});
+
+// Catch unauthorised errors
+app.use(function (err, req, res, next) {
+  if (err.name === "UnauthorizedError") {
+    res.status(401);
+    res.json({ message: err.name + ": " + err.message });
+  }
 });
 
 // error handler
