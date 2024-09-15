@@ -1,7 +1,8 @@
 import { proxyMiddleware } from "../middleware/proxy_middleware";
+import type { Response, Request, Express } from "express";
 
-export default function (app) {
-  app.use("/health", function (req, res) {
+export default function (app: Express) {
+  app.use("/health", function (req: Request, res: Response) {
     return res.status(200).json("Health Checked");
   });
   app.use("/auth", proxyMiddleware("http://localhost:3001"));

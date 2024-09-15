@@ -3,8 +3,10 @@
 /**
  * Module dependencies.
  */
+import type { Express } from "express";
+import { HttpError } from "http-errors";
 
-var app = require("../app");
+var app: Express = require("../app");
 var debug = require("debug")("inventory-api-gateway:server");
 var http = require("http");
 
@@ -33,7 +35,7 @@ server.on("listening", onListening);
  * Normalize a port into a number, string, or false.
  */
 
-function normalizePort(val) {
+function normalizePort(val: any) {
   var port = parseInt(val, 10);
 
   if (isNaN(port)) {
@@ -53,7 +55,7 @@ function normalizePort(val) {
  * Event listener for HTTP server "error" event.
  */
 
-function onError(error) {
+function onError(error: HttpError) {
   if (error.syscall !== "listen") {
     throw error;
   }
