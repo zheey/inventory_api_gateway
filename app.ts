@@ -3,13 +3,14 @@ import * as dotenv from "dotenv";
 dotenv.config();
 
 import indexRouter from "./src/routes/index";
+import type { Response, Request, Express, NextFunction } from "express";
 var createError = require("http-errors");
 var express = require("express");
 var path = require("path");
 var cookieParser = require("cookie-parser");
 var logger = require("morgan");
 
-var app = express();
+var app: Express = express();
 
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
@@ -31,10 +32,6 @@ app.use(function (req, res, next) {
       " Access-Control-Allow-Credential"
   );
   res.header("Access-Control-Allow-Credentials", "true");
-  res.language = req.query.language || "en";
-  res.langKey = req.query.langKey || false;
-  global._language = res.language;
-
   next();
 });
 
@@ -46,7 +43,7 @@ app.use(function (req, res, next) {
 });
 
 // Catch unauthorised errors
-app.use(function (err, req, res, next) {
+app.use(function (err: Error, req: Request, res: Response) {
   if (err.name === "UnauthorizedError") {
     res.status(401);
     res.json({ message: err.name + ": " + err.message });
@@ -54,7 +51,12 @@ app.use(function (err, req, res, next) {
 });
 
 // error handler
-app.use(function (err, req, res, next) {
+app.use(function (
+  err: Error & { status?: number },
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get("env") === "development" ? err : {};
